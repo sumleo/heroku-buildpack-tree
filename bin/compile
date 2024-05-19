@@ -24,15 +24,19 @@ cd unix-tree-${TREE_VERSION}
 # Compile tree
 make
 
-# Install tree to the build directory
-make PREFIX=$BUILD_DIR/usr MANDIR=$BUILD_DIR/usr/share/man install
+# Make a directory to place the binary
+mkdir -p $BUILD_DIR/vendor/bin
 
-# Move the tree binary to /usr/local/bin
-mv $BUILD_DIR/usr/bin/tree /usr/local/bin/
+# Move the tree binary to the vendor/bin directory
+mv tree $BUILD_DIR/vendor/bin/
+
+# Ensure tree is available for the application
+mkdir -p $BUILD_DIR/.profile.d
+cat <<EOF > $BUILD_DIR/.profile.d/add-env-vars.sh
+export PATH="\$HOME/vendor/bin:\$PATH"
+EOF
 
 # Clean up
 rm -rf $TMP_DIR
 
-# Ensure tree is available for the application
-mkdir -p $BUILD_DIR/.profile.d
-echo 'export PATH="$PATH:/usr/local/bin"' > $BUILD_DIR/.profile.d/custom_path.sh
+echo "-----> Tree ${TREE_VERSION} installed!"
