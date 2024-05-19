@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+BUILD_DIR=$1
+
+# Define the version of tree to install
+TREE_VERSION=2.1.1
+
+# Create a temporary directory for building tree
+TMP_DIR=$(mktemp -d)
+
+# Navigate to the temporary directory
+cd $TMP_DIR
+
+# Download the tree source code
+curl -LO https://gitlab.com/OldManProgrammer/unix-tree/-/archive/${TREE_VERSION}/unix-tree-${TREE_VERSION}.tar.bz2
+
+# Extract the tarball
+tar -xjf unix-tree-${TREE_VERSION}.tar.bz2
+
+# Navigate to the extracted directory
+cd unix-tree-${TREE_VERSION}
+
+# Compile tree
+make
+
+# Install tree to the build directory
+make PREFIX=$BUILD_DIR/usr MANDIR=$BUILD_DIR/usr/share/man install
+
+# Clean up
+rm -rf $TMP_DIR
+
+# Ensure tree is available for the application
+mkdir -p $BUILD_DIR/.profile.d
+echo 'export PATH="$PATH:/usr/bin"' > $BUILD_DIR/.profile.d/custom_path.sh
